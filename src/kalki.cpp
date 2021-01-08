@@ -11,11 +11,15 @@ double calcRPN(string expr, unsigned char* error, bool verbose);
 
 int main(int argc, char const *argv[])
 {
-	if(argc>1)
+	unsigned char error;
+	double result;
+	for (int i = 1; i < argc; i++)
 	{
-		unsigned char error;
-		double result = calcRPN(argv[1], &error, true);
-		cout << (error==0 ? to_string(result) : "error=" + to_string(error)) << endl;
+		result = calcRPN(argv[i], &error);
+		if(error==0)
+			cout << result << endl;
+		else
+			cout << "error=" << (int)error << endl;
 	}
 	return 0;
 }
@@ -27,10 +31,6 @@ double calcRPN(string expr, unsigned char* error)
 	*error = 0;
 	for (int i = 0; i < expr.length(); i++)
 	{
-		cout << "stack=";
-		for(int n=0; n<stack.size(); n++)
-			cout << stack[n] << ":";
-		cout << endl;
 		if(expr[i]==SEP)
 		{
 			if(word == "+")
@@ -40,11 +40,10 @@ double calcRPN(string expr, unsigned char* error)
 					double a = stack.back();
 					stack.pop_back();
 					double& b = stack.back();
-					// cout << b << '+' << a << endl;
 					b = b + a;
 				}
 				else
-					{*error=1;}//cout << "RPN syntaxe error" << endl; break;}
+					{*error=1;}
 			}
 			else if(word == "-")
 			{
@@ -53,11 +52,10 @@ double calcRPN(string expr, unsigned char* error)
 					double a = stack.back();
 					stack.pop_back();
 					double& b = stack.back();
-					// cout << b << '-' << a << endl;
 					b = b - a;
 				}
 				else
-					{*error=1;}//cout << "RPN syntaxe error" << endl; break;}
+					{*error=1;}
 			}
 			else if (word == "*")
 			{
@@ -66,11 +64,10 @@ double calcRPN(string expr, unsigned char* error)
 					double a = stack.back();
 					stack.pop_back();
 					double& b = stack.back();
-					// cout << b << '*' << a << endl;
 					b = b * a;
 				}
 				else
-					{*error=1;}//cout << "RPN syntaxe error" << endl; break;}
+					{*error=1;}
 			}
 			else if (word == "/")
 			{
@@ -79,11 +76,10 @@ double calcRPN(string expr, unsigned char* error)
 					double a = stack.back();
 					stack.pop_back();
 					double& b = stack.back();
-					// cout << b << '/' << a << endl;
 					b = b / a;
 				}
 				else
-					{*error=1;}//cout << "RPN syntaxe error" << endl; break;}
+					{*error=1;}
 			}
 			else if (word == "cos")
 			{
@@ -163,7 +159,6 @@ double calcRPN(string expr, unsigned char* error)
 				}
 				catch(invalid_argument)
 				{
-					//cout << word << " was not declared" << endl;
 					*error = 2;
 					break;
 				}
@@ -173,10 +168,13 @@ double calcRPN(string expr, unsigned char* error)
 		else
 			word += expr[i];
 	}
-	if(stack.size()>0)
+	if(stack.size()==1)
 		return stack[0];
 	else
+	{
+		*error = *error==0 ? (unsigned char)3 : *error;
 		return 0;
+	}
 }
 
 double calcRPN(string expr, unsigned char* error, bool verbose)
@@ -390,7 +388,7 @@ double calcRPN(string expr, unsigned char* error, bool verbose)
 		return stack[0];
 	else
 	{
-		*error = 3;
+		*error = *error==0 ? (unsigned char)3 : *error;
 		return 0;
 	}
 }
