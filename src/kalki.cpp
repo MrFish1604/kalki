@@ -9,6 +9,7 @@
 using namespace std;
 
 double calcRPN(string expr, unsigned char* error);
+double calcRPN(string expr, double* lastResult, unsigned char* error);
 double calcRPN(string expr, unsigned char* error, bool verbose);
 
 int main(int argc, char const *argv[])
@@ -28,6 +29,7 @@ int main(int argc, char const *argv[])
 		{	
 			cout << "Operators :" << endl;
 			cout << "+\t-\t*\t/\t^" << endl;
+			cout << "You can use '$' to get the last result.\te.g. 1:2:+ 3:$:*  OUTPUT  3 9" << endl;
 
 			cout << "\nConstants :" << endl;
 			cout << "pi\te" << endl;
@@ -42,6 +44,8 @@ int main(int argc, char const *argv[])
 	unsigned char error;
 	double result;
 	std::vector<string> params;
+	double lastResult;
+	bool lastResultSet = false;
 	for (int i = 1; i < argc; i++)
 	{
 		if(argv[i][0]=='-')
@@ -50,7 +54,14 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{
-			result = calcRPN(argv[i], &error);
+			if(lastResultSet)
+				result = calcRPN(argv[i], &lastResult, &error);
+			else
+			{
+				result = calcRPN(argv[i], &error);
+				lastResultSet = true;
+			}
+			lastResult = result;
 			if(error==0)
 				cout << result << endl;
 			else
@@ -201,7 +212,7 @@ double calcRPN(string expr, unsigned char* error)
 			}
 			else
 			{
-				if(i==expr.length())
+				if(i==expr.length() && stack.size()!=0)
 					*error = 4;
 				else
 				{
@@ -213,6 +224,183 @@ double calcRPN(string expr, unsigned char* error)
 							stack.push_back(NEPER);
 						else if (word=="pi")
 							stack.push_back(PI);
+						else
+						{
+							*error = 2;
+							break;
+						}
+					}
+				}
+			}
+			word = "";
+		}
+		else
+			word += expr[i];
+	}
+	if(stack.size()==1)
+		return stack[0];
+	else
+	{
+		*error = *error==0 ? (unsigned char)3 : *error;
+		return 0;
+	}
+}
+
+double calcRPN(string expr, double* lastResult, unsigned char* error)
+{
+	vector<double> stack;
+	string word = "";
+	*error = 0;
+	for (int i = 0; i <= expr.length(); i++)
+	{
+		if(i==expr.length() || expr[i]==SEP)
+		{
+			if(word == "+")
+			{
+				if(stack.size()>1)
+				{
+					double a = stack.back();
+					stack.pop_back();
+					double& b = stack.back();
+					b = b + a;
+				}
+				else
+					{*error=1;}
+			}
+			else if(word == "-")
+			{
+				if(stack.size()>1)
+				{
+					double a = stack.back();
+					stack.pop_back();
+					double& b = stack.back();
+					b = b - a;
+				}
+				else
+					{*error=1;}
+			}
+			else if (word == "*")
+			{
+				if(stack.size()>1)
+				{
+					double a = stack.back();
+					stack.pop_back();
+					double& b = stack.back();
+					b = b * a;
+				}
+				else
+					{*error=1;}
+			}
+			else if (word == "/")
+			{
+				if(stack.size()>1)
+				{
+					double a = stack.back();
+					stack.pop_back();
+					double& b = stack.back();
+					b = b / a;
+				}
+				else
+					{*error=1;}
+			}
+			else if (word == "^")
+			{
+				if(stack.size()>1)
+				{
+					double a = stack.back();
+					stack.pop_back();
+					double& b = stack.back();
+					b = pow(b, a);
+				}
+				else
+					{*error=1;}
+			}
+			else if (word == "cos")
+			{
+				if(stack.size()>0)
+					stack.back() = cos(stack.back());
+				else
+					*error = 1;
+			}
+			else if (word == "sin")
+			{
+				if(stack.size()>0)
+					stack.back() = sin(stack.back());
+				else
+					*error = 1;
+			}
+			else if (word == "tan")
+			{
+				if(stack.size()>0)
+					stack.back() = tan(stack.back());
+				else
+					*error = 1;
+			}
+			else if(word == "arccos" or word == "acos")
+			{
+				if(stack.size()>0)
+					stack.back() = acos(stack.back());
+				else
+					*error = 1;
+			}
+			else if(word == "arcsin" or word == "asin")
+			{
+				if(stack.size()>0)
+					stack.back() = asin(stack.back());
+				else
+					*error = 1;
+			}
+			else if(word == "arctan" or word == "atan")
+			{
+				if(stack.size()>0)
+					stack.back() = atan(stack.back());
+				else
+					*error = 1;
+			}
+			else if (word == "exp")
+			{
+				if(stack.size()>0)
+					stack.back() = exp(stack.back());
+				else
+					*error = 1;
+			}
+			else if (word == "ln" or word == "log")
+			{
+				if(stack.size()>0)
+					stack.back() = log(stack.back());
+				else
+					*error = 1;
+			}
+			else if (word == "log2")
+			{
+				if(stack.size()>0)
+					stack.back() = log2(stack.back());
+				else
+					*error = 1;
+			}
+			else if (word == "log10")
+			{
+				if(stack.size()>0)
+					stack.back() = log10(stack.back());
+				else
+					*error = 1;
+			}
+			else
+			{
+				if(i==expr.length() && stack.size()!=0)
+					*error = 4;
+				else
+				{
+					try
+						{stack.push_back(stod(word));}
+					catch(invalid_argument)
+					{
+						if(word=="e")
+							stack.push_back(NEPER);
+						else if (word=="pi")
+							stack.push_back(PI);
+						else if (word=="$")
+							stack.push_back(*lastResult);
 						else
 						{
 							*error = 2;
