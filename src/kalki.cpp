@@ -13,15 +13,34 @@ double calcRPN(string expr, unsigned char* error, bool verbose);
 
 int main(int argc, char const *argv[])
 {
-	unsigned char error;
-	double result;
-	for (int i = 1; i < argc; i++)
+	const char* help = "--help";
+	if(argc>1 && (string(argv[1])=="--help") || string(argv[1])=="-h")
 	{
-		result = calcRPN(argv[i], &error);
-		if(error==0)
-			cout << result << endl;
-		else
-			cout << "error=" << (int)error << endl;
+		cout << "Usage : kalki [OPTION]... [EXPRESSION]..." << endl;
+		cout << "\nExpressions must be separate by space." << endl;
+		cout << "Terms must be separate by ':'.\te.g. (1+2)*3 => 1:2:+:3:*\n" << endl;
+		cout << "\t-h, --help\tshow this help" << endl;
+	}
+	else
+	{
+		unsigned char error;
+		double result;
+		std::vector<string> params;
+		for (int i = 1; i < argc; i++)
+		{
+			if(argv[i][0]=='-')
+			{
+				params.push_back(argv[i]);
+			}
+			else
+			{
+				result = calcRPN(argv[i], &error);
+				if(error==0)
+					cout << result << endl;
+				else
+					cout << "error=" << (int)error << endl;
+			}
+		}
 	}
 	return 0;
 }
