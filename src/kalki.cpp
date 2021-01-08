@@ -14,12 +14,30 @@ double calcRPN(string expr, unsigned char* error, bool verbose);
 int main(int argc, char const *argv[])
 {
 	const char* help = "--help";
-	if(argc>1 && (string(argv[1])=="--help") || string(argv[1])=="-h")
+	if(argc>1)
 	{
-		cout << "Usage : kalki [OPTION]... [EXPRESSION]..." << endl;
-		cout << "\nExpressions must be separate by space." << endl;
-		cout << "Terms must be separate by ':'.\te.g. (1+2)*3 => 1:2:+:3:*\n" << endl;
-		cout << "\t-h, --help\tshow this help" << endl;
+		if(string(argv[1])=="--help" || string(argv[1])=="-h")
+		{
+			cout << "Usage : kalki [OPTION]... [EXPRESSION]..." << endl;
+			cout << "\nExpressions must be separate by spaces." << endl;
+			cout << "Terms must be separate by ':'.\te.g. (1+2)*3 => 1:2:+:3:*\n" << endl;
+			cout << "  -l\t\tlist operators, constants and functions availables." << endl;
+			cout << "  -h, --help\tshow this help." << endl;
+		}
+		else if(string(argv[1])=="-l")
+		{	
+			cout << "Operators :" << endl;
+			cout << "+\t-\t*\t/\t^" << endl;
+
+			cout << "\nConstants :" << endl;
+			cout << "pi\te" << endl;
+
+			cout << "\nFunctions :" << endl;
+			cout << "cos\tsin\ttan" << endl;
+			cout << "arccos\tarcsin\tarctan" << endl;
+			cout << "exp\tln\tlog2" << endl;
+			cout << "log10" << endl;
+		}
 	}
 	else
 	{
