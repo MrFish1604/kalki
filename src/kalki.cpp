@@ -83,6 +83,18 @@ double calcRPN(string expr, unsigned char* error)
 				else
 					{*error=1;}
 			}
+			else if (word == "^")
+			{
+				if(stack.size()>1)
+				{
+					double a = stack.back();
+					stack.pop_back();
+					double& b = stack.back();
+					b = pow(b, a);
+				}
+				else
+					{*error=1;}
+			}
 			else if (word == "cos")
 			{
 				if(stack.size()>0)
