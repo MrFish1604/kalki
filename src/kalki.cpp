@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 #define SEP ':'
 
@@ -68,6 +69,26 @@ int main(int argc, char const *argv[])
 					else
 						{cout << "RPN syntaxe error" << endl; break;}
 				}
+				else if (word == "cos")
+					stack.back() = cos(stack.back());
+				else if (word == "sin")
+					stack.back() = sin(stack.back());
+				else if (word == "tan")
+					stack.back() = tan(stack.back());
+				else if(word == "arccos" or word == "acos")
+					stack.back() = acos(stack.back());
+				else if(word == "arcsin" or word == "asin")
+					stack.back() = asin(stack.back());
+				else if(word == "arctan" or word == "atan")
+					stack.back() = atan(stack.back());
+				else if (word == "exp")
+					stack.back() = exp(stack.back());
+				else if (word == "ln" or word == "log")
+					stack.back() = log(stack.back());
+				else if (word == "log2")
+					stack.back() = log2(stack.back());
+				else if (word == "log10")
+					stack.back() = log10(stack.back());
 				else
 				{
 					try 
