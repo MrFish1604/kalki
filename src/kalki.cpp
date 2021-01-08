@@ -18,40 +18,74 @@ int main(int argc, char const *argv[])
 			{
 				if(word == "+")
 				{
-					double a = stack.back();
-					stack.pop_back();
-					double& b = stack.back();
-					b = b + a;
+					if(stack.size()>1)
+					{
+						double a = stack.back();
+						stack.pop_back();
+						double& b = stack.back();
+						// cout << b << '+' << a << endl;
+						b = b + a;
+					}
+					else
+						{cout << "RPN syntaxe error" << endl; break;}
 				}
 				else if(word == "-")
 				{
-					double a = stack.back();
-					stack.pop_back();
-					double& b = stack.back();
-					b = b - a;
+					if(stack.size()>1)
+					{
+						double a = stack.back();
+						stack.pop_back();
+						double& b = stack.back();
+						// cout << b << '-' << a << endl;
+						b = b - a;
+					}
+					else
+						{cout << "RPN syntaxe error" << endl; break;}
 				}
 				else if (word == "*")
 				{
-					double a = stack.back();
-					stack.pop_back();
-					double& b = stack.back();
-					b = b * a;
+					if(stack.size()>1)
+					{
+						double a = stack.back();
+						stack.pop_back();
+						double& b = stack.back();
+						// cout << b << '*' << a << endl;
+						b = b * a;
+					}
+					else
+						{cout << "RPN syntaxe error" << endl; break;}
 				}
 				else if (word == "/")
 				{
-					double a = stack.back();
-					stack.pop_back();
-					double& b = stack.back();
-					b = b / a;
+					if(stack.size()>1)
+					{
+						double a = stack.back();
+						stack.pop_back();
+						double& b = stack.back();
+						// cout << b << '/' << a << endl;
+						b = b / a;
+					}
+					else
+						{cout << "RPN syntaxe error" << endl; break;}
 				}
 				else
-					stack.push_back(stod(word));
+				{
+					try 
+					{
+						stack.push_back(stod(word));
+					}
+					catch(invalid_argument)
+					{
+						cout << word << " was not declared" << endl;
+					}
+				}
 				word = "";
 			}
 			else
 				word += expr[i];
 		}
-		cout << stack[0] << endl;
+		if(stack.size()>0)
+			cout << stack[0] << endl;
 	}
 	return 0;
 }
