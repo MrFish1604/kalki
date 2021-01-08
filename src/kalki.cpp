@@ -3,6 +3,8 @@
 #include <cmath>
 
 #define SEP ':'
+#define NEPER 2.718281828459
+#define PI 3.141592653590
 
 using namespace std;
 
@@ -161,8 +163,15 @@ double calcRPN(string expr, unsigned char* error)
 						{stack.push_back(stod(word));}
 					catch(invalid_argument)
 					{
-						*error = 2;
-						break;
+						if(word=="e")
+							stack.push_back(NEPER);
+						else if (word=="pi")
+							stack.push_back(PI);
+						else
+						{
+							*error = 2;
+							break;
+						}
 					}
 				}
 			}
@@ -370,15 +379,20 @@ double calcRPN(string expr, unsigned char* error, bool verbose)
 			}
 			else
 			{
-				try 
-				{
-					stack.push_back(stod(word));
-				}
+				try
+					{stack.push_back(stod(word));}
 				catch(invalid_argument)
 				{
-					cout << word << " was not declared" << endl;
-					*error = 2;
-					break;
+					if(word=="e")
+						stack.push_back(NEPER);
+					else if (word=="pi")
+						stack.push_back(PI);
+					else
+					{
+						cout << word << " was not declared" << endl;
+						*error = 2;
+						break;
+					}
 				}
 			}
 			word = "";
