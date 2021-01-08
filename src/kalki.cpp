@@ -39,25 +39,22 @@ int main(int argc, char const *argv[])
 			cout << "log10" << endl;
 		}
 	}
-	else
+	unsigned char error;
+	double result;
+	std::vector<string> params;
+	for (int i = 1; i < argc; i++)
 	{
-		unsigned char error;
-		double result;
-		std::vector<string> params;
-		for (int i = 1; i < argc; i++)
+		if(argv[i][0]=='-')
 		{
-			if(argv[i][0]=='-')
-			{
-				params.push_back(argv[i]);
-			}
+			params.push_back(argv[i]);
+		}
+		else
+		{
+			result = calcRPN(argv[i], &error);
+			if(error==0)
+				cout << result << endl;
 			else
-			{
-				result = calcRPN(argv[i], &error);
-				if(error==0)
-					cout << result << endl;
-				else
-					cout << "error=" << (int)error << endl;
-			}
+				cout << "error=" << (int)error << endl;
 		}
 	}
 	return 0;
