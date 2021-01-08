@@ -29,9 +29,9 @@ double calcRPN(string expr, unsigned char* error)
 	vector<double> stack;
 	string word = "";
 	*error = 0;
-	for (int i = 0; i < expr.length(); i++)
+	for (int i = 0; i <= expr.length(); i++)
 	{
-		if(expr[i]==SEP)
+		if(i==expr.length() || expr[i]==SEP)
 		{
 			if(word == "+")
 			{
@@ -153,14 +153,17 @@ double calcRPN(string expr, unsigned char* error)
 			}
 			else
 			{
-				try 
+				if(i==expr.length())
+					*error = 4;
+				else
 				{
-					stack.push_back(stod(word));
-				}
-				catch(invalid_argument)
-				{
-					*error = 2;
-					break;
+					try
+						{stack.push_back(stod(word));}
+					catch(invalid_argument)
+					{
+						*error = 2;
+						break;
+					}
 				}
 			}
 			word = "";
