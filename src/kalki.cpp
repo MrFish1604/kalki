@@ -77,6 +77,7 @@ int main(int argc, char const *argv[])
 					catch(invalid_argument)
 					{
 						cout << word << " was not declared" << endl;
+						break;
 					}
 				}
 				word = "";
