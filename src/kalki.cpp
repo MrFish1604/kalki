@@ -176,9 +176,9 @@ double calcRPN(string expr, unsigned char* error)
 					catch(invalid_argument)
 					{
 						if(word=="e")
-							stack.push_back(NEPER)
+							stack.push_back(NEPER);
 						else if (word=="pi")
-							stack.push_back(PI)
+							stack.push_back(PI);
 						else
 						{
 							*error = 2;
