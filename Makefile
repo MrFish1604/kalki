@@ -4,3 +4,11 @@ bin/kalki: bin/ src/kalki.cpp
 
 bin/:
 	mkdir bin
+
+install: bin/kalki
+	cp bin/kalki /usr/bin/kalki
+	chown root:root /usr/bin/kalki
+	chmod 755 /usr/bin/kalki
+
+uninstall: /usr/bin/kalki
+	rm /usr/bin/kalki
