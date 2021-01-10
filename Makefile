@@ -14,10 +14,8 @@ uninstall: /usr/bin/kalki
 	rm /usr/bin/kalki
 
 update:
-	git stash
 	git checkout main
 	git pull
 	make bin/kalki
 	sudo make install
-	git stash pop
 	@echo "\nKalki successfully updated."
