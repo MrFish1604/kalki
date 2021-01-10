@@ -8,8 +8,8 @@
 
 using namespace std;
 
-double calcRPN(string expr, unsigned char* error);
-double calcRPN(string expr, double* lastResult, unsigned char* error);
+double calcRPN(string expr, unsigned char* error, const char sep=SEP);
+double calcRPN(string expr, double* lastResult, unsigned char* error, const char sep=SEP);
 double calcRPN(string expr, unsigned char* error, bool verbose);
 
 int main(int argc, char const *argv[])
@@ -22,6 +22,7 @@ int main(int argc, char const *argv[])
 			cout << "Usage : kalki [OPTION]... [EXPRESSION]..." << endl;
 			cout << "\nExpressions must be separate by spaces." << endl;
 			cout << "Terms must be separate by ':'.\te.g. (1+2)*3 => 1:2:+:3:*\n" << endl;
+			cout << "  -c\t\tstart consol, use space rather than ':'." << endl;
 			cout << "  -l\t\tlist operators, constants and functions availables." << endl;
 			cout << "  -h, --help\tshow this help." << endl;
 		}
@@ -50,7 +51,32 @@ int main(int argc, char const *argv[])
 	{
 		if(argv[i][0]=='-')
 		{
-			params.push_back(argv[i]);
+			if(string(argv[i])=="-c")
+			{
+				cout << "Enter 'exit' to leave the program\n" << endl;
+				while(true)
+				{
+					string expr;
+					cout << "> ";
+					getline(cin, expr);
+					if(expr == "exit")
+						break;
+					if(lastResultSet)
+						result = calcRPN(expr, &lastResult, &error, ' ');
+					else
+					{
+						result = calcRPN(expr, &error, ' ');
+						lastResultSet = true;
+					}
+					lastResult = result;
+					if(error==0)
+						cout << "= " << result << endl << endl;
+					else
+						cout << "error= " << (int)error << endl;
+				}
+			}
+			else
+				params.push_back(argv[i]);
 		}
 		else
 		{
@@ -71,14 +97,14 @@ int main(int argc, char const *argv[])
 	return 0;
 }
 
-double calcRPN(string expr, unsigned char* error)
+double calcRPN(string expr, unsigned char* error, const char sep)
 {
 	vector<double> stack;
 	string word = "";
 	*error = 0;
 	for (int i = 0; i <= expr.length(); i++)
 	{
-		if(i==expr.length() || expr[i]==SEP)
+		if(i==expr.length() || expr[i]==sep)
 		{
 			if(word == "+")
 			{
@@ -246,14 +272,14 @@ double calcRPN(string expr, unsigned char* error)
 	}
 }
 
-double calcRPN(string expr, double* lastResult, unsigned char* error)
+double calcRPN(string expr, double* lastResult, unsigned char* error, const char sep)
 {
 	vector<double> stack;
 	string word = "";
 	*error = 0;
 	for (int i = 0; i <= expr.length(); i++)
 	{
-		if(i==expr.length() || expr[i]==SEP)
+		if(i==expr.length() || expr[i]==sep)
 		{
 			if(word == "+")
 			{
