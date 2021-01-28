@@ -49,6 +49,7 @@ int main(int argc, char const *argv[])
 	bool lastResultSet = false;
 	double vars[26];
 	for(int i=0; i<26; i++) vars[i]=0;
+	vars[4] = NEPER;
 	for (int i = 1; i < argc; i++)
 	{
 		if(argv[i][0]=='-')
@@ -252,7 +253,7 @@ double calcRPN(string expr, unsigned char* error, double* vars, const char sep)
 				double a = stack.back();
 				stack.pop_back();
 				stack.pop_back();
-				vars[toDef.back()-25] = a;
+				vars[toDef.back()-97] = a;
 				defed.push_back("");
 				defed.back() = defed.back() + toDef.back() + '=' + to_string(a);
 				toDef.pop_back();
@@ -267,15 +268,13 @@ double calcRPN(string expr, unsigned char* error, double* vars, const char sep)
 						{stack.push_back(stod(word));}
 					catch(invalid_argument)
 					{
-						if(word=="e")
-							stack.push_back(NEPER);
-						else if (word=="pi")
+						if (word=="pi")
 							stack.push_back(PI);
 						else if (word.length()==1)
 						{
 							if(word[0]>96 && word[0]<123)
 							{
-								stack.push_back(vars[word[0]-25]);
+								stack.push_back(vars[word[0]-97]);
 								toDef.push_back(word[0]);
 							}
 							else
@@ -460,7 +459,7 @@ double calcRPN(string expr, double* lastResult, unsigned char* error, double* va
 				double a = stack.back();
 				stack.pop_back();
 				stack.pop_back();
-				vars[toDef.back()-25] = a;
+				vars[toDef.back()-97] = a;
 				defed.push_back("");
 				defed.back() = defed.back() + toDef.back() + '=' + to_string(a);
 				toDef.pop_back();
@@ -475,9 +474,7 @@ double calcRPN(string expr, double* lastResult, unsigned char* error, double* va
 						{stack.push_back(stod(word));}
 					catch(invalid_argument)
 					{
-						if(word=="e")
-							stack.push_back(NEPER);
-						else if (word=="pi")
+						if (word=="pi")
 							stack.push_back(PI);
 						else if (word=="$")
 							stack.push_back(*lastResult);
@@ -485,7 +482,7 @@ double calcRPN(string expr, double* lastResult, unsigned char* error, double* va
 						{
 							if(word[0]>96 && word[0]<123)
 							{
-								stack.push_back(vars[word[0]-25]);
+								stack.push_back(vars[word[0]-97]);
 								toDef.push_back(word[0]);
 							}
 							else
