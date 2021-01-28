@@ -39,7 +39,7 @@ int main(int argc, char const *argv[])
 			cout << "cos\tsin\ttan" << endl;
 			cout << "arccos\tarcsin\tarctan" << endl;
 			cout << "exp\tln\tlog2" << endl;
-			cout << "log10" << endl;
+			cout << "log10\tsqrt" << endl;
 		}
 	}
 	unsigned char error;
@@ -165,6 +165,13 @@ double calcRPN(string expr, unsigned char* error, const char sep)
 				}
 				else
 					{*error=1;}
+			}
+			else if (word == "sqrt")
+			{
+				if(stack.size()>0)
+					stack.back() = sqrt(stack.back());
+				else
+					*error = 1;
 			}
 			else if (word == "cos")
 			{
