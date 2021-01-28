@@ -252,8 +252,8 @@ double calcRPN(string expr, unsigned char* error, double* vars, const char sep)
 			{
 				double a = stack.back();
 				stack.pop_back();
-				stack.pop_back();
 				vars[toDef.back()-97] = a;
+				stack.back() = a;
 				defed.push_back("");
 				defed.back() = defed.back() + toDef.back() + '=' + to_string(a);
 				toDef.pop_back();
@@ -458,8 +458,8 @@ double calcRPN(string expr, double* lastResult, unsigned char* error, double* va
 			{
 				double a = stack.back();
 				stack.pop_back();
-				stack.pop_back();
 				vars[toDef.back()-97] = a;
+				stack.back() = a;
 				defed.push_back("");
 				defed.back() = defed.back() + toDef.back() + '=' + to_string(a);
 				toDef.pop_back();
