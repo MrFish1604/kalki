@@ -8,9 +8,9 @@
 
 using namespace std;
 
-double calcRPN(string expr, unsigned char* error, const char sep=SEP);
-double calcRPN(string expr, double* lastResult, unsigned char* error, const char sep=SEP);
-double calcRPN(string expr, unsigned char* error, bool verbose);
+double calcRPN(string expr, unsigned char* error, double* vars, const char sep=SEP);
+double calcRPN(string expr, double* lastResult, unsigned char* error, double* vars, const char sep=SEP);
+/*double calcRPN(string expr, unsigned char* error, bool verbose);*/
 
 int main(int argc, char const *argv[])
 {
@@ -47,6 +47,8 @@ int main(int argc, char const *argv[])
 	std::vector<string> params;
 	double lastResult;
 	bool lastResultSet = false;
+	double vars[26];
+	for(int i=0; i<26; i++) vars[i]=0;
 	for (int i = 1; i < argc; i++)
 	{
 		if(argv[i][0]=='-')
@@ -62,10 +64,10 @@ int main(int argc, char const *argv[])
 					if(expr == "exit")
 						break;
 					if(lastResultSet)
-						result = calcRPN(expr, &lastResult, &error, ' ');
+						result = calcRPN(expr, &lastResult, &error, vars, ' ');
 					else
 					{
-						result = calcRPN(expr, &error, ' ');
+						result = calcRPN(expr, &error, vars, ' ');
 						lastResultSet = true;
 					}
 					lastResult = result;
@@ -81,10 +83,10 @@ int main(int argc, char const *argv[])
 		else
 		{
 			if(lastResultSet)
-				result = calcRPN(argv[i], &lastResult, &error);
+				result = calcRPN(argv[i], &lastResult, &error, vars, SEP);
 			else
 			{
-				result = calcRPN(argv[i], &error);
+				result = calcRPN(argv[i], &error, vars, SEP);
 				lastResultSet = true;
 			}
 			lastResult = result;
@@ -97,9 +99,11 @@ int main(int argc, char const *argv[])
 	return 0;
 }
 
-double calcRPN(string expr, unsigned char* error, const char sep)
+double calcRPN(string expr, unsigned char* error, double* vars, const char sep)
 {
 	vector<double> stack;
+	vector<char> toDef;
+	vector<string> defed;
 	string word = "";
 	*error = 0;
 	for (int i = 0; i <= expr.length(); i++)
@@ -243,6 +247,16 @@ double calcRPN(string expr, unsigned char* error, const char sep)
 				else
 					*error = 1;
 			}
+			else if (word == "=")
+			{
+				double a = stack.back();
+				stack.pop_back();
+				stack.pop_back();
+				vars[toDef.back()-25] = a;
+				defed.push_back("");
+				defed.back() = defed.back() + toDef.back() + '=' + to_string(a);
+				toDef.pop_back();
+			}
 			else
 			{
 				if(i==expr.length() && stack.size()!=0)
@@ -257,6 +271,19 @@ double calcRPN(string expr, unsigned char* error, const char sep)
 							stack.push_back(NEPER);
 						else if (word=="pi")
 							stack.push_back(PI);
+						else if (word.length()==1)
+						{
+							if(word[0]>96 && word[0]<123)
+							{
+								stack.push_back(vars[word[0]-25]);
+								toDef.push_back(word[0]);
+							}
+							else
+							{
+								*error = 2;
+								break;
+							}
+						}
 						else
 						{
 							*error = 2;
@@ -274,14 +301,17 @@ double calcRPN(string expr, unsigned char* error, const char sep)
 		return stack[0];
 	else
 	{
-		*error = *error==0 ? (unsigned char)3 : *error;
+		if(defed.size()==0)
+			*error = *error==0 ? (unsigned char)3 : *error;
 		return 0;
 	}
 }
 
-double calcRPN(string expr, double* lastResult, unsigned char* error, const char sep)
+double calcRPN(string expr, double* lastResult, unsigned char* error, double* vars, const char sep)
 {
 	vector<double> stack;
+	vector<char> toDef;
+	vector<string> defed;
 	string word = "";
 	*error = 0;
 	for (int i = 0; i <= expr.length(); i++)
@@ -424,6 +454,16 @@ double calcRPN(string expr, double* lastResult, unsigned char* error, const char
 					stack.back() = log10(stack.back());
 				else
 					*error = 1;
+			}
+			else if (word == "=")
+			{
+				double a = stack.back();
+				stack.pop_back();
+				stack.pop_back();
+				vars[toDef.back()-25] = a;
+				defed.push_back("");
+				defed.back() = defed.back() + toDef.back() + '=' + to_string(a);
+				toDef.pop_back();
 			}
 			else
 			{
@@ -441,6 +481,19 @@ double calcRPN(string expr, double* lastResult, unsigned char* error, const char
 							stack.push_back(PI);
 						else if (word=="$")
 							stack.push_back(*lastResult);
+						else if (word.length()==1)
+						{
+							if(word[0]>96 && word[0]<123)
+							{
+								stack.push_back(vars[word[0]-25]);
+								toDef.push_back(word[0]);
+							}
+							else
+							{
+								*error = 2;
+								break;
+							}
+						}
 						else
 						{
 							*error = 2;
@@ -458,12 +511,13 @@ double calcRPN(string expr, double* lastResult, unsigned char* error, const char
 		return stack[0];
 	else
 	{
-		*error = *error==0 ? (unsigned char)3 : *error;
+		if(defed.size()==0)
+			*error = *error==0 ? (unsigned char)3 : *error;
 		return 0;
 	}
 }
 
-double calcRPN(string expr, unsigned char* error, bool verbose)
+/*double calcRPN(string expr, unsigned char* error, double* vars, bool verbose)
 {
 	vector<double> stack;
 	string word = "";
@@ -658,6 +712,12 @@ double calcRPN(string expr, unsigned char* error, bool verbose)
 				else
 					*error = 1;
 			}
+			else if (word == "=")
+			{
+				double a = stack.back();
+				stack.pop_back();
+				char c = stack.back();
+			}
 			else
 			{
 				try 
@@ -684,4 +744,4 @@ double calcRPN(string expr, unsigned char* error, bool verbose)
 		*error = *error==0 ? (unsigned char)3 : *error;
 		return 0;
 	}
-}
+}*/
