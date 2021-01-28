@@ -348,6 +348,13 @@ double calcRPN(string expr, double* lastResult, unsigned char* error, const char
 				else
 					{*error=1;}
 			}
+			else if (word == "sqrt")
+			{
+				if(stack.size()>0)
+					stack.back() = sqrt(stack.back());
+				else
+					*error = 1;
+			}
 			else if (word == "cos")
 			{
 				if(stack.size()>0)
@@ -523,6 +530,13 @@ double calcRPN(string expr, unsigned char* error, bool verbose)
 				}
 				else
 					{*error=1; cout << "RPN syntaxe error" << endl; break;}
+			}
+			else if (word == "sqrt")
+			{
+				if(stack.size()>0)
+					stack.back() = sqrt(stack.back());
+				else
+					*error = 1;
 			}
 			else if (word == "cos")
 			{
