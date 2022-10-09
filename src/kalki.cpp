@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stack>
 #include <map>
+#include <stdexcept>
 
 #define SEP ':'
 #define NEPER 2.718281828459
@@ -17,12 +18,12 @@ double aminusb(const double a, const double b) {return a-b;}
 double atimesb(const double a, const double b) {return a*b;}
 double aonb(const double a, const double b) {return a/b;}
 
-int main(int argc, char const *argv[])
-{
-	map<const char*, double(*)(const double, const double)> binope;
-	map<const char*, double(*)(const double)> unope;
-	map<const char*, double> var;
+map<const string, double(*)(const double, const double)> binope;
+map<const string, double(*)(const double)> unope;
+map<const string, double> var;
 
+int main(int argc, char const **argv)
+{
 	var["pi"] = PI;
 	var["e"] = NEPER;
 
@@ -44,23 +45,24 @@ int main(int argc, char const *argv[])
 	unope["arccos"] = acos;
 	unope["arcsin"] = asin;
 	unope["arctan"] = atan;
-	for(int i=0; i<argc; i++)
+
+	for(int i=1; i<argc; i++)
 	{
-		if(argv[i]=="--help" || argv[i]=="-h")
+		if(string(argv[i])=="--help" || string(argv[i])=="-h")
 		{
 			cout << "Usage : kalki [OPTION]... [EXPRESSION]..." << endl;
 			cout << "\nExpressions must be separate by spaces." << endl;
 			cout << "Terms must be separate by ':'.\te.g. (1+2)*3 => 1:2:+:3:*\n" << endl;
-			cout << "  -c\t\tstart consol, use space rather than ':'." << endl;
+			cout << "  -c\t\tstart consol, use space rather than ':'. (not yet)" << endl;
 			cout << "  -l\t\tlist operators, constants and functions availables." << endl;
 			cout << "  -h, --help\tshow this help." << endl;
-			exit(0);
+			continue;
 		}
-		if(argv[i]=="-l")
+		if(string(argv[i])=="-l")
 		{
 			cout << "Operators :" << endl;
 			cout << "+\t-\t*\t/\t^" << endl;
-			cout << "You can use '$' to get the last result.\te.g. 1:2:+ 3:$:*  OUTPUT  3 9" << endl;
+			cout << "You can use '$' to get the last result.\te.g. 1:2:+ 3:$:*  OUTPUT  3 9 (not yet)" << endl;
 
 			cout << "\nConstants :" << endl;
 			cout << "pi\te" << endl;
@@ -70,15 +72,52 @@ int main(int argc, char const *argv[])
 			cout << "arccos\tarcsin\tarctan" << endl;
 			cout << "exp\tln\tlog2" << endl;
 			cout << "log10\tsqrt" << endl;
-			exit(0);
+			continue;
 		}
 		if(argv[i]=="-c")
 		{
-			// Start consol
+			// TODO -- Start console mode
 			continue;	
 		}
-		
-		cout << calcRPN(argv[i]) << endl;
+		cout << argv[i] << "\t=\t";
+		cout << calcRPN(argv[i], SEP) << endl;
+	}
+	return 0;
+}
+
+int make_calc(stack<double>& stck, string& word)
+{
+	try{
+		double (*f)(const double, const double) = binope.at(word);
+		if(stck.size()<2)
+		{
+			return 1;
+		}
+		double b = stck.top();
+		stck.pop();
+		double& a = stck.top();
+		a = f(a, b);
+	}
+	catch(const out_of_range&)
+	{
+		try{
+			double (*f)(const double) = unope.at(word);
+			if(stck.empty())
+				return 1;
+			
+			stck.top() = f(stck.top());
+		}
+		catch(const out_of_range& err)
+		{
+			// TODO -- Manage variables
+			try{
+				stck.push(stod(word));
+			}
+			catch(const invalid_argument&)
+			{
+				return 2;
+			}
+		}
 	}
 	return 0;
 }
@@ -92,81 +131,15 @@ double calcRPN(string expr, const char sep)
 		const char& c = expr[i];
 		if(c==':')
 		{
-
+			make_calc(stck, word);
+			word = "";
 		}
 		else
 		{
 			word += c;
 		}
 	}
-	return 0.;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-double calcRPN(string expr)
-{
-	stack<double> stck;
-	string word = "";
-	for(int i=0; i<expr.length(); i++)
-	{
-		if(expr[i]==':')
-		{
-			if(word=="+")
-			{
-				if(stck.size()>1)
-				{
-					double a = stck.top();
-					stck.pop();
-					stck.top() += a;
-				}
-			}
-			else if(word=="-")
-			{
-				if(stck.size()>1)
-				{
-				double a = stck.top();
-				stck.pop();
-				stck.top() -= a;
-				}
-			}
-			else if(word=="*")
-			{
-				if(stck.size()>1)
-				{
-				double a = stck.top();
-				stck.pop();
-				stck.top() *= a;
-				}
-			}
-			else if(word=="/")
-			{
-				if(stck.size()>1)
-				{
-				double a = stck.top();
-				stck.pop();
-				stck.top() /= a;
-				}
-			}
-			else
-			{
-				stck.push(stod(word));
-			}
-			word = "";
-		}
-		else
-		{
-			word += expr[i];
-		}
-	}
+	if(word!="")
+		make_calc(stck, word);
 	return stck.top();
 }
