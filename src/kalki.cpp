@@ -4,6 +4,7 @@
 #include <stack>
 #include <map>
 #include <stdexcept>
+#include <colorspp.h>
 
 #define SEP ':'
 #define NEPER M_E
@@ -84,22 +85,22 @@ int main(int argc, char const **argv)
 				getline(cin, uentry);
 				try{
 					vars["$"] = calcRPN(uentry, ' ');
-					cout << vars["$"] << endl << endl;
+					cout << color(to_string(vars["$"]), GREENFG) << endl << endl;
 				}
 				catch(const exception& err){
-					cout << err.what() << endl;
+					cout << color(err.what(), BREDFG) << endl;
 				}
 			}
 			continue;
 		}
 		try{
 			vars["$"] = calcRPN(argv[i], SEP);
-			cout << argv[i] << "\t=\t";
-			cout << vars["$"] << endl;
+			cout << color(argv[i], BLUEFG) << "\t" << color("=", BLACKFG) << "\t";
+			cout << color(to_string(vars["$"]), GREENFG) << endl;
 		}
 		catch(const exception& err)
 		{
-			cerr << err.what() << endl;
+			cerr << color(err.what(), BREDFG) << endl;
 		}
 	}
 	return 0;

@@ -1,5 +1,5 @@
 bin/kalki: bin/ src/kalki.cpp
-	g++ src/kalki.cpp -o bin/kalki
+	g++ src/kalki.cpp -o bin/kalki -lcolorspp
 	@echo "\nYou can find kalki in bin/"
 
 bin/:
