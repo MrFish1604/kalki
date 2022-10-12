@@ -6,8 +6,11 @@
 #include <stdexcept>
 
 #define SEP ':'
-#define NEPER 2.718281828459
-#define PI 3.141592653590
+// #define NEPER 2.718281828459
+#define NEPER M_E
+// #define PI 3.141592653590
+#define PI M_PI
+
 
 using namespace std;
 
@@ -85,41 +88,42 @@ int main(int argc, char const **argv)
 	return 0;
 }
 
-int make_calc(stack<double>& stck, string& word)
+void make_calc(stack<double>& stck, string& word)
 {
+	double (*f2)(const double, const double) = nullptr;
 	try{
-		double (*f)(const double, const double) = binope.at(word);
-		if(stck.size()<2)
-		{
-			return 1;
-		}
-		double b = stck.top();
-		stck.pop();
-		double& a = stck.top();
-		a = f(a, b);
+		f2 = binope.at(word);
 	}
 	catch(const out_of_range&)
 	{
+		double (*f1)(const double) = nullptr;
 		try{
-			double (*f)(const double) = unope.at(word);
-			if(stck.empty())
-				return 1;
-			
-			stck.top() = f(stck.top());
+			f1 = unope.at(word);
 		}
-		catch(const out_of_range& err)
+		catch(const out_of_range&)
 		{
 			// TODO -- Manage variables
 			try{
 				stck.push(stod(word));
+				return;
 			}
 			catch(const invalid_argument&)
 			{
-				return 2;
+				throw invalid_argument("Unable to interpret " + word);
 			}
 		}
+		if(stck.empty())
+			throw out_of_range(word + " needs 1 operands (" + to_string(stck.size()) + " remain in stack)");
+		stck.top() = f1(stck.top());
 	}
-	return 0;
+	if(stck.size()<2)
+	{
+		throw out_of_range(word + " needs 2 operands (" + to_string(stck.size()) + " remain in stack)");
+	}
+	double b = stck.top();
+	stck.pop();
+	double& a = stck.top();
+	a = f2(a, b);
 }
 
 double calcRPN(string expr, const char sep)
@@ -141,5 +145,7 @@ double calcRPN(string expr, const char sep)
 	}
 	if(word!="")
 		make_calc(stck, word);
+	if(stck.empty())
+		throw out_of_range("The stack is empty");
 	return stck.top();
 }
