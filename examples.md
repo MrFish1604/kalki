@@ -10,7 +10,7 @@ Output
 ```
 ### Define variable
 ```bash
-kalki a:3:3:*:= 6:4:* a:2:*
+kalki 3:3:*:=a 6:4:* a:2:*
 ```
 Output
 ```bash
