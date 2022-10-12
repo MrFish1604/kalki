@@ -6,9 +6,7 @@
 #include <stdexcept>
 
 #define SEP ':'
-// #define NEPER 2.718281828459
 #define NEPER M_E
-// #define PI 3.141592653590
 #define PI M_PI
 
 
@@ -56,7 +54,7 @@ int main(int argc, char const **argv)
 			cout << "Usage : kalki [OPTION]... [EXPRESSION]..." << endl;
 			cout << "\nExpressions must be separate by spaces." << endl;
 			cout << "Terms must be separate by ':'.\te.g. (1+2)*3 => 1:2:+:3:*\n" << endl;
-			cout << "  -c\t\tstart consol, use space rather than ':'. (not yet)" << endl;
+			cout << "  -c\t\tstart consol, use space rather than ':'." << endl;
 			cout << "  -l\t\tlist operators, constants and functions availables." << endl;
 			cout << "  -h, --help\tshow this help." << endl;
 			continue;
@@ -65,7 +63,7 @@ int main(int argc, char const **argv)
 		{
 			cout << "Operators :" << endl;
 			cout << "+\t-\t*\t/\t^" << endl;
-			cout << "You can use '$' to get the last result.\te.g. 1:2:+ 3:$:*  OUTPUT  3 9 (not yet)" << endl;
+			cout << "You can use '$' to get the last result.\te.g. 1:2:+ 3:$:*  OUTPUT  3 9" << endl;
 
 			cout << "\nConstants :" << endl;
 			cout << "pi\te" << endl;
@@ -77,10 +75,22 @@ int main(int argc, char const **argv)
 			cout << "log10\tsqrt" << endl;
 			continue;
 		}
-		if(argv[i]=="-c")
+		if(string(argv[i])=="-c")
 		{
-			// TODO -- Start console mode
-			continue;	
+			while(true)
+			{
+				string uentry;
+				cout << ">> ";
+				getline(cin, uentry);
+				try{
+					vars["$"] = calcRPN(uentry, ' ');
+					cout << vars["$"] << endl << endl;
+				}
+				catch(const exception& err){
+					cout << err.what() << endl;
+				}
+			}
+			continue;
 		}
 		try{
 			vars["$"] = calcRPN(argv[i], SEP);
@@ -154,7 +164,7 @@ double calcRPN(string expr, const char sep)
 	for(int i=0; i<expr.length(); i++)
 	{
 		const char& c = expr[i];
-		if(c==':')
+		if(c==sep)
 		{
 			make_calc(stck, word);
 			word = "";
