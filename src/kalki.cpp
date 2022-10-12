@@ -23,12 +23,12 @@ double aonb(const double a, const double b) {return a/b;}
 
 map<const string, double(*)(const double, const double)> binope;
 map<const string, double(*)(const double)> unope;
-map<const string, double> var;
+map<const string, double> vars;
 
 int main(int argc, char const **argv)
 {
-	var["pi"] = PI;
-	var["e"] = NEPER;
+	vars["pi"] = PI;
+	vars["e"] = NEPER;
 
 	binope["+"] = aplusb;
 	binope["-"] = aminusb;
@@ -83,9 +83,9 @@ int main(int argc, char const **argv)
 			continue;	
 		}
 		try{
-			double res = calcRPN(argv[i], SEP);
+			vars["$"] = calcRPN(argv[i], SEP);
 			cout << argv[i] << "\t=\t";
-			cout << calcRPN(argv[i], SEP) << endl;
+			cout << vars["$"] << endl;
 		}
 		catch(const exception& err)
 		{
@@ -109,19 +109,33 @@ void make_calc(stack<double>& stck, string& word)
 		}
 		catch(const out_of_range&)
 		{
-			// TODO -- Manage variables
 			try{
 				stck.push(stod(word));
 				return;
 			}
 			catch(const invalid_argument&)
 			{
-				throw invalid_argument("Unable to interpret " + word);
+				try{
+					stck.push(vars.at(word));
+					return;
+				}
+				catch(const out_of_range&){
+					if(word[0]=='=')
+					{
+						const string varname = string(word.c_str()+1);
+						if(stck.empty())
+							throw out_of_range("Unable to set " + varname + " (the stack is empty)");
+						vars[varname] = stck.top();
+						return;
+					}
+					throw invalid_argument("Unable to interpret " + word);
+				}
 			}
 		}
 		if(stck.empty())
 			throw out_of_range(word + " needs 1 operands (" + to_string(stck.size()) + " remain in stack)");
 		stck.top() = f1(stck.top());
+		return;
 	}
 	if(stck.size()<2)
 	{
