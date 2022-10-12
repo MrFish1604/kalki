@@ -82,8 +82,15 @@ int main(int argc, char const **argv)
 			// TODO -- Start console mode
 			continue;	
 		}
-		cout << argv[i] << "\t=\t";
-		cout << calcRPN(argv[i], SEP) << endl;
+		try{
+			double res = calcRPN(argv[i], SEP);
+			cout << argv[i] << "\t=\t";
+			cout << calcRPN(argv[i], SEP) << endl;
+		}
+		catch(const exception& err)
+		{
+			cerr << err.what() << endl;
+		}
 	}
 	return 0;
 }
