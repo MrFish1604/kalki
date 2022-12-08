@@ -83,6 +83,11 @@ int main(int argc, char const **argv)
 				string uentry;
 				cout << ">> ";
 				getline(cin, uentry);
+				if(cin.eof())
+				{
+					cout << endl;
+					break;
+				}
 				try{
 					vars["$"] = calcRPN(uentry, ' ');
 					cout << color(to_string(vars["$"]), GREENFG) << endl << endl;
